@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>لوحة إدارة Flow Access</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2035;
+  --border: #2a3050;
+  --text: #e5e7eb;
+  --text-muted: #9ca3af;
+  --primary: #3fd0c9;
+  --primary-dim: rgba(63,208,201,0.15);
+  --danger: #ef4444;
+  --danger-dim: rgba(239,68,68,0.15);
+  --warning: #f59e0b;
+  --warning-dim: rgba(245,158,11,0.15);
+  --success: #10b981;
+  --success-dim: rgba(16,185,129,0.15);
+  --radius: 10px;
+  --font: 'Noto Sans Arabic', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.7;
+}
+
+/* Login */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-box h1 {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--primary);
+}
+
+.login-box p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+}
+
+input[dir="ltr"] {
+  text-align: left;
+  font-family: 'Courier New', monospace;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--bg);
+}
+
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.btn-danger {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,0.3);
+}
+
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+.btn-warning {
+  background: var(--warning-dim);
+  color: var(--warning);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+.btn-warning:hover { background: rgba(245,158,11,0.25); }
+
+.btn-success {
+  background: var(--success-dim);
+  color: var(--success);
+  border: 1px solid rgba(16,185,129,0.3);
+}
+
+.btn-success:hover { background: rgba(16,185,129,0.25); }
+
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-block { width: 100%; justify-content: center; }
+
+/* Dashboard */
+.app-container { display: none; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar h1 { font-size: 18px; color: var(--primary); }
+
+.topbar-actions { display: flex; gap: 12px; align-items: center; }
+
+.admin-name { color: var(--text-muted); font-size: 13px; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.tab {
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.tab:hover { background: var(--surface2); color: var(--text); }
+.tab.active { background: var(--primary-dim); color: var(--primary); }
+
+.content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Table */
+.table-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  background: var(--surface2);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+td { vertical-align: middle; }
+
+tr:hover td { background: rgba(63,208,201,0.03); }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-active { background: var(--success-dim); color: var(--success); }
+.badge-expired { background: var(--warning-dim); color: var(--warning); }
+.badge-revoked { background: var(--danger-dim); color: var(--danger); }
+
+.key-cell {
+  font-family: 'Courier New', monospace;
+  direction: ltr;
+  text-align: left;
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.actions-cell { white-space: nowrap; }
+.actions-cell .btn { margin: 2px; }
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h2 {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: var(--primary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-start;
+}
+
+/* Alert */
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.alert-error {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border: 1px solid rgba(239,68,68,0.3);
+}
+
+.alert-success {
+  background: var(--success-dim);
+  color: var(--success);
+  border: 1px solid rgba(16,185,129,0.3);
+}
+
+/* Audit log */
+.log-entry {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.log-entry:last-child { border-bottom: none; }
+
+.log-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  direction: ltr;
+  display: inline-block;
+}
+
+.log-action { font-weight: 600; color: var(--primary); }
+
+.log-details { color: var(--text-muted); margin-top: 4px; }
+
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .content { padding: 16px; }
+  .toolbar { flex-direction: column; }
+  .search-input { min-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-container" id="loginContainer">
+  <div class="login-box">
+    <h1>🔐 لوحة الإدارة</h1>
+    <p>Flow Access — نظام إدارة التراخيص</p>
+    <div id="loginAlert"></div>
+    <div class="form-group">
+      <label>اسم المستخدم</label>
+      <input type="text" id="loginUsername" dir="ltr" autocomplete="username" placeholder="admin" value="admin">
+    </div>
+    <div class="form-group">
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPassword" dir="ltr" autocomplete="current-password" placeholder="AdminSecret123!">
+    </div>
+    <button class="btn btn-primary btn-block" id="loginBtn" onclick="doLogin()">تسجيل الدخول</button>
+    <div style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:14px;background:rgba(255,255,255,0.03);padding:8px;border-radius:6px;border:1px dashed var(--border);">
+      بيانات الدخول الافتراضية:<br>
+      المستخدم: <strong style="color:var(--primary)">admin</strong> | كلمة المرور: <strong style="color:var(--primary)">AdminSecret123!</strong>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div class="app-container" id="appContainer">
+  <div class="topbar">
+    <h1>🛡️ لوحة إدارة التراخيص</h1>
+    <div class="topbar-actions">
+      <span class="admin-name" id="adminName"></span>
+      <button class="btn btn-danger btn-sm" onclick="doLogout()">تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('overview')">نظرة عامة</button>
+    <button class="tab" onclick="switchTab('clients')">العملاء</button>
+    <button class="tab" onclick="switchTab('licenses')">التراخيص</button>
+    <button class="tab" onclick="switchTab('audit')">سجل التدقيق</button>
+  </div>
+
+  <div class="content">
+    <!-- Overview -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-grid" id="statsGrid"></div>
+    </div>
+
+    <!-- Clients -->
+    <div class="panel" id="panel-clients">
+      <div class="toolbar">
+        <input type="text" class="search-input" placeholder="بحث بالاسم أو المعرّف..." id="clientSearch" oninput="loadClients()">
+        <button class="btn btn-primary" onclick="showModal('addClient')">+ عميل جديد</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>البريد</th>
+              <th>التراخيص</th>
+              <th>تاريخ الإنشاء</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="clientsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Licenses -->
+    <div class="panel" id="panel-licenses">
+      <div class="toolbar">
+        <input type="text" class="search-input" placeholder="بحث بالاسم أو المفتاح أو المعرّف..." id="licenseSearch" oninput="loadLicenses()">
+        <select id="licenseFilter" onchange="loadLicenses()" style="width:auto;min-width:120px">
+          <option value="">جميع الحالات</option>
+          <option value="active">فعّال</option>
+          <option value="expired">منتهي</option>
+          <option value="revoked">ملغى</option>
+        </select>
+        <button class="btn btn-primary" onclick="showModal('addLicense')">+ ترخيص جديد</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>العميل</th>
+              <th>مفتاح الترخيص</th>
+              <th>الحالة</th>
+              <th>تاريخ الإنشاء</th>
+              <th>تاريخ الانتهاء</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="licensesTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Audit -->
+    <div class="panel" id="panel-audit">
+      <div class="table-container" id="auditLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add Client -->
+<div class="modal-overlay" id="modal-addClient">
+  <div class="modal">
+    <h2>إنشاء عميل جديد</h2>
+    <div id="addClientAlert"></div>
+    <div class="form-group">
+      <label>اسم العميل *</label>
+      <input type="text" id="clientName">
+    </div>
+    <div class="form-group">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="clientEmail" dir="ltr">
+    </div>
+    <div class="form-group">
+      <label>ملاحظات</label>
+      <textarea id="clientNotes" rows="3"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="createClient()">إنشاء</button>
+      <button class="btn btn-danger" onclick="hideModal('addClient')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add License -->
+<div class="modal-overlay" id="modal-addLicense">
+  <div class="modal">
+    <h2>إنشاء ترخيص جديد</h2>
+    <div id="addLicenseAlert"></div>
+    <div class="form-group">
+      <label>العميل *</label>
+      <select id="licenseClientId"></select>
+    </div>
+    <div class="form-group">
+      <label>مدة الاشتراك *</label>
+      <select id="licenseDuration" onchange="toggleCustomDays()">
+        <option value="1day">يوم واحد</option>
+        <option value="2days">يومان</option>
+        <option value="1week">أسبوع واحد</option>
+        <option value="1month" selected>شهر واحد</option>
+        <option value="custom">مدة مخصصة</option>
+      </select>
+    </div>
+    <div class="form-group" id="customDaysGroup" style="display:none">
+      <label>عدد الأيام</label>
+      <input type="number" id="licenseCustomDays" min="1" value="30">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="createLicense()">إنشاء الترخيص</button>
+      <button class="btn btn-danger" onclick="hideModal('addLicense')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Extend License -->
+<div class="modal-overlay" id="modal-extendLicense">
+  <div class="modal">
+    <h2>تعديل مدة الاشتراك</h2>
+    <div id="extendLicenseAlert"></div>
+    <input type="hidden" id="extendLicenseId">
+    <div class="form-group">
+      <label>المدة الجديدة (من الآن)</label>
+      <select id="extendDuration" onchange="toggleExtendCustom()">
+        <option value="1day">يوم واحد</option>
+        <option value="2days">يومان</option>
+        <option value="1week">أسبوع واحد</option>
+        <option value="1month" selected>شهر واحد</option>
+        <option value="custom">مدة مخصصة</option>
+      </select>
+    </div>
+    <div class="form-group" id="extendCustomGroup" style="display:none">
+      <label>عدد الأيام</label>
+      <input type="number" id="extendCustomDays" min="1" value="30">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-warning" onclick="extendLicense()">تعديل المدة</button>
+      <button class="btn btn-danger" onclick="hideModal('extendLicense')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Revoke -->
+<div class="modal-overlay" id="modal-revokeLicense">
+  <div class="modal">
+    <h2>إلغاء الترخيص</h2>
+    <input type="hidden" id="revokeLicenseId">
+    <div class="form-group">
+      <label>سبب الإلغاء</label>
+      <textarea id="revokeReason" rows="3" placeholder="اختياري..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="revokeLicense()">تأكيد الإلغاء</button>
+      <button class="btn btn-success" onclick="hideModal('revokeLicense')">تراجع</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Reactivate -->
+<div class="modal-overlay" id="modal-reactivateLicense">
+  <div class="modal">
+    <h2>إعادة تفعيل الترخيص</h2>
+    <div id="reactivateAlert"></div>
+    <input type="hidden" id="reactivateLicenseId">
+    <div class="form-group">
+      <label>المدة الجديدة (من الآن)</label>
+      <select id="reactivateDuration" onchange="toggleReactivateCustom()">
+        <option value="1day">يوم واحد</option>
+        <option value="2days">يومان</option>
+        <option value="1week">أسبوع واحد</option>
+        <option value="1month" selected>شهر واحد</option>
+        <option value="custom">مدة مخصصة</option>
+      </select>
+    </div>
+    <div class="form-group" id="reactivateCustomGroup" style="display:none">
+      <label>عدد الأيام</label>
+      <input type="number" id="reactivateCustomDays" min="1" value="30">
+    </div>
+    <div class="form-group">
+      <label>سبب إعادة التفعيل</label>
+      <textarea id="reactivateReason" rows="2" placeholder="اختياري..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-success" onclick="reactivateLicense()">إعادة التفعيل</button>
+      <button class="btn btn-danger" onclick="hideModal('reactivateLicense')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = (window.location.origin && window.location.origin.startsWith('http'))
+  ? window.location.origin + '/api'
+  : 'http://localhost:3000/api';
+let token = localStorage.getItem('adminToken');
+let adminUsername = localStorage.getItem('adminUsername');
+
+// Auth
+function headers() {
+  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+}
+
+async function doLogin() {
+  const username = (document.getElementById('loginUsername').value || '').trim();
+  const password = (document.getElementById('loginPassword').value || '').trim();
+  document.getElementById('loginAlert').innerHTML = '';
+  
+  if (!username || !password) {
+    document.getElementById('loginAlert').innerHTML = 
+      `<div class="alert alert-error">يُرجى إدخال اسم المستخدم وكلمة المرور.</div>`;
+    return;
+  }
+  
+  try {
+    const res = await fetch(API_URL + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'اسم المستخدم أو كلمة المرور غير صحيحة.');
+    
+    token = data.token;
+    adminUsername = data.username;
+    localStorage.setItem('adminToken', token);
+    localStorage.setItem('adminUsername', adminUsername);
+    showDashboard();
+  } catch (err) {
+    let msg = err.message;
+    if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+      msg = 'تعذر الاتصال بالخادم. تأكد من تشغيل الخادم على المنفذ 3000 (عبر ملف تشغيل_خادم_التحكم.bat).';
+    }
+    document.getElementById('loginAlert').innerHTML = 
+      `<div class="alert alert-error">${msg}</div>`;
+  }
+}
+
+function doLogout() {
+  token = null;
+  adminUsername = null;
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminUsername');
+  document.getElementById('loginContainer').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginContainer').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  document.getElementById('adminName').textContent = adminUsername;
+  loadStats();
+}
+
+// Enter key login
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('loginUsername').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+});
+
+// Tabs
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  
+  if (name === 'overview') loadStats();
+  if (name === 'clients') loadClients();
+  if (name === 'licenses') loadLicenses();
+  if (name === 'audit') loadAuditLog();
+}
+
+// Modals
+function showModal(name) {
+  document.getElementById('modal-' + name).classList.add('show');
+  if (name === 'addLicense') loadClientsForSelect();
+}
+
+function hideModal(name) {
+  document.getElementById('modal-' + name).classList.remove('show');
+}
+
+function toggleCustomDays() {
+  document.getElementById('customDaysGroup').style.display = 
+    document.getElementById('licenseDuration').value === 'custom' ? 'block' : 'none';
+}
+
+function toggleExtendCustom() {
+  document.getElementById('extendCustomGroup').style.display = 
+    document.getElementById('extendDuration').value === 'custom' ? 'block' : 'none';
+}
+
+function toggleReactivateCustom() {
+  document.getElementById('reactivateCustomGroup').style.display = 
+    document.getElementById('reactivateDuration').value === 'custom' ? 'block' : 'none';
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('ar-EG', {
+    year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+}
+
+function statusBadge(status) {
+  const map = { active: 'فعّال', expired: 'منتهي', revoked: 'ملغى' };
+  return `<span class="badge badge-${status}">${map[status] || status}</span>`;
+}
+
+// API Calls
+async function apiCall(url, options = {}) {
+  const res = await fetch(API_URL + url, { ...options, headers: headers() });
+  if (res.status === 401) { doLogout(); throw new Error('انتهت الجلسة'); }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error);
+  return data;
+}
+
+async function loadStats() {
+  try {
+    const stats = await apiCall('/admin/stats');
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-value">${stats.totalClients}</div><div class="stat-label">إجمالي العملاء</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.totalLicenses}</div><div class="stat-label">إجمالي التراخيص</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--success)">${stats.activeLicenses}</div><div class="stat-label">تراخيص فعّالة</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--warning)">${stats.expiredLicenses}</div><div class="stat-label">تراخيص منتهية</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--danger)">${stats.revokedLicenses}</div><div class="stat-label">تراخيص ملغاة</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:var(--warning)">${stats.expiringIn7Days}</div><div class="stat-label">تنتهي خلال 7 أيام</div></div>
+    `;
+  } catch (err) { console.error(err); }
+}
+
+async function loadClients() {
+  try {
+    const search = document.getElementById('clientSearch').value;
+    const clients = await apiCall('/admin/clients' + (search ? '?search=' + encodeURIComponent(search) : ''));
+    const tbody = document.getElementById('clientsTable');
+    if (clients.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">لا يوجد عملاء</td></tr>';
+      return;
+    }
+    tbody.innerHTML = clients.map(c => `
+      <tr>
+        <td><strong>${esc(c.name)}</strong><br><small style="color:var(--text-muted);direction:ltr;display:inline-block">${c.id.slice(0,8)}...</small></td>
+        <td>${esc(c.email || '—')}</td>
+        <td>${c.license_count}</td>
+        <td>${formatDate(c.created_at)}</td>
+        <td class="actions-cell">
+          <button class="btn btn-primary btn-sm" onclick="quickLicense('${c.id}','${esc(c.name)}')">+ ترخيص</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) { console.error(err); }
+}
+
+async function loadLicenses() {
+  try {
+    const search = document.getElementById('licenseSearch').value;
+    const status = document.getElementById('licenseFilter').value;
+    let url = '/admin/licenses?';
+    if (search) url += 'search=' + encodeURIComponent(search) + '&';
+    if (status) url += 'status=' + status;
+    
+    const licenses = await apiCall(url);
+    const tbody = document.getElementById('licensesTable');
+    if (licenses.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">لا يوجد تراخيص</td></tr>';
+      return;
+    }
+    tbody.innerHTML = licenses.map(l => {
+      let actions = '';
+      if (l.status === 'active') {
+        actions = `
+          <button class="btn btn-warning btn-sm" onclick="showExtend('${l.id}')">تعديل المدة</button>
+          <button class="btn btn-danger btn-sm" onclick="showRevoke('${l.id}')">إلغاء</button>
+        `;
+      } else if (l.status === 'revoked' || l.status === 'expired') {
+        actions = `<button class="btn btn-success btn-sm" onclick="showReactivate('${l.id}')">إعادة تفعيل</button>`;
+      }
+      
+      return `<tr>
+        <td>${esc(l.client_name)}</td>
+        <td class="key-cell">${esc(l.license_key)}</td>
+        <td>${statusBadge(l.status)}</td>
+        <td>${formatDate(l.created_at)}</td>
+        <td>${formatDate(l.expires_at)}</td>
+        <td class="actions-cell">${actions}</td>
+      </tr>`;
+    }).join('');
+  } catch (err) { console.error(err); }
+}
+
+async function loadClientsForSelect() {
+  try {
+    const clients = await apiCall('/admin/clients');
+    const select = document.getElementById('licenseClientId');
+    select.innerHTML = clients.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('');
+  } catch (err) { console.error(err); }
+}
+
+async function createClient() {
+  try {
+    const name = document.getElementById('clientName').value;
+    const email = document.getElementById('clientEmail').value;
+    const notes = document.getElementById('clientNotes').value;
+    if (!name.trim()) {
+      document.getElementById('addClientAlert').innerHTML = '<div class="alert alert-error">اسم العميل مطلوب</div>';
+      return;
+    }
+    await apiCall('/admin/clients', { method: 'POST', body: JSON.stringify({ name, email, notes }) });
+    hideModal('addClient');
+    document.getElementById('clientName').value = '';
+    document.getElementById('clientEmail').value = '';
+    document.getElementById('clientNotes').value = '';
+    document.getElementById('addClientAlert').innerHTML = '';
+    loadClients();
+  } catch (err) {
+    document.getElementById('addClientAlert').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+  }
+}
+
+async function createLicense() {
+  try {
+    const clientId = document.getElementById('licenseClientId').value;
+    const duration = document.getElementById('licenseDuration').value;
+    const customDays = document.getElementById('licenseCustomDays').value;
+    
+    const data = await apiCall('/admin/licenses', {
+      method: 'POST',
+      body: JSON.stringify({ clientId, duration, customDays: parseInt(customDays) })
+    });
+    
+    document.getElementById('addLicenseAlert').innerHTML = 
+      `<div class="alert alert-success">✅ تم إنشاء الترخيص بنجاح!<br><strong style="direction:ltr;display:block;font-family:monospace;margin-top:8px;word-break:break-all">${data.license_key}</strong></div>`;
+    loadLicenses();
+    loadStats();
+  } catch (err) {
+    document.getElementById('addLicenseAlert').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+  }
+}
+
+function quickLicense(clientId, clientName) {
+  showModal('addLicense');
+  setTimeout(() => {
+    const select = document.getElementById('licenseClientId');
+    select.innerHTML = `<option value="${clientId}">${clientName}</option>`;
+  }, 300);
+}
+
+function showExtend(id) {
+  document.getElementById('extendLicenseId').value = id;
+  document.getElementById('extendLicenseAlert').innerHTML = '';
+  showModal('extendLicense');
+}
+
+async function extendLicense() {
+  try {
+    const id = document.getElementById('extendLicenseId').value;
+    const duration = document.getElementById('extendDuration').value;
+    const customDays = document.getElementById('extendCustomDays').value;
+    await apiCall('/admin/licenses/' + id + '/extend', {
+      method: 'PUT',
+      body: JSON.stringify({ duration, customDays: parseInt(customDays) })
+    });
+    hideModal('extendLicense');
+    loadLicenses();
+    loadStats();
+  } catch (err) {
+    document.getElementById('extendLicenseAlert').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+  }
+}
+
+function showRevoke(id) {
+  document.getElementById('revokeLicenseId').value = id;
+  showModal('revokeLicense');
+}
+
+async function revokeLicense() {
+  try {
+    const id = document.getElementById('revokeLicenseId').value;
+    const reason = document.getElementById('revokeReason').value;
+    await apiCall('/admin/licenses/' + id + '/revoke', {
+      method: 'PUT',
+      body: JSON.stringify({ reason })
+    });
+    hideModal('revokeLicense');
+    document.getElementById('revokeReason').value = '';
+    loadLicenses();
+    loadStats();
+  } catch (err) { alert(err.message); }
+}
+
+function showReactivate(id) {
+  document.getElementById('reactivateLicenseId').value = id;
+  document.getElementById('reactivateAlert').innerHTML = '';
+  showModal('reactivateLicense');
+}
+
+async function reactivateLicense() {
+  try {
+    const id = document.getElementById('reactivateLicenseId').value;
+    const duration = document.getElementById('reactivateDuration').value;
+    const customDays = document.getElementById('reactivateCustomDays').value;
+    const reason = document.getElementById('reactivateReason').value;
+    await apiCall('/admin/licenses/' + id + '/reactivate', {
+      method: 'PUT',
+      body: JSON.stringify({ duration, customDays: parseInt(customDays), reason })
+    });
+    hideModal('reactivateLicense');
+    loadLicenses();
+    loadStats();
+  } catch (err) {
+    document.getElementById('reactivateAlert').innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+  }
+}
+
+async function loadAuditLog() {
+  try {
+    const logs = await apiCall('/admin/audit-log?limit=100');
+    const container = document.getElementById('auditLog');
+    if (logs.length === 0) {
+      container.innerHTML = '<div class="empty-state">لا يوجد سجلات</div>';
+      return;
+    }
+    container.innerHTML = logs.map(log => `
+      <div class="log-entry">
+        <span class="log-time">${formatDate(log.created_at)}</span>
+        <span class="log-action">${esc(log.action)}</span>
+        ${log.admin_username ? ` — <strong>${esc(log.admin_username)}</strong>` : ''}
+        <div class="log-details">${esc(log.details || '')}</div>
+      </div>
+    `).join('');
+  } catch (err) { console.error(err); }
+}
+
+// Utils
+function esc(str) {
+  if (!str) return '';
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Init
+if (token) {
+  showDashboard();
+}
+</script>
+</body>
+</html>
