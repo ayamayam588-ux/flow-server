@@ -29,9 +29,15 @@ PORT = int(os.environ.get('PORT', 3000))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 DB_PATH = os.path.join(DATA_DIR, 'licenses.db')
+if not os.path.exists(DB_PATH) and os.path.exists(os.path.join(BASE_DIR, 'licenses.db')):
+    DB_PATH = os.path.join(BASE_DIR, 'licenses.db')
+
 ADMIN_PANEL_PATH = os.path.join(BASE_DIR, 'admin-panel', 'index.html')
 if not os.path.exists(ADMIN_PANEL_PATH):
-    ADMIN_PANEL_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', 'server', 'admin-panel', 'index.html'))
+    if os.path.exists(os.path.join(BASE_DIR, 'index.html')):
+        ADMIN_PANEL_PATH = os.path.join(BASE_DIR, 'index.html')
+    else:
+        ADMIN_PANEL_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', 'server', 'admin-panel', 'index.html'))
 
 # سر توقيع الرموز
 SECRET_KEY = os.environ.get('SECRET_KEY', 'afb_secret_key_' + hashlib.sha256(b'afb_super_secret_salt').hexdigest())
